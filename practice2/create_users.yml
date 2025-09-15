@@ -1,0 +1,27 @@
+---
+- name: question 7
+  hosts: prod
+  vars:
+    - professor: prof
+  vars_files:
+    - users_pass.yml
+  tasks:
+    - name: Ensure group exists
+      ansible.builtin.group:
+        name: "{{ item.department }}"
+        state: present
+      loop: "{{ users }}"
+
+    - name: create the users
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        groups: "{{ item.department }}"
+        password: "{{ item.password | password_hash('sha256', 'mysecretsalt') }}"
+        append: true
+      loop: "{{ users }}"
+      when: professor in item.department 
+
+    - name: debug the psswd
+      debug:
+        msg: "{{ item.password | password_hash('sha256', 'mysecretsalt') }}"
+      loop: "{{ users }}"

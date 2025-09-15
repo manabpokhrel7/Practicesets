@@ -1,0 +1,15 @@
+---
+- name: install packages
+  hosts: 
+    - dev 
+    - test
+    - prod
+  tasks:
+    - name: install packages
+      dnf:
+        name:
+          - perl
+          - php
+        state: latest
+    - name: update everything
+      command: dnf update -y

@@ -1,0 +1,28 @@
+---
+- name: Gather and check package facts
+  hosts: ansible4
+  vars:
+    package_list:
+      - kernel
+      - bash
+      - glibc
+  become: yes
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: auto
+    - name: remove the file before creating for idempotency 
+      shell: rm -rf /root/packages.txt
+
+    - name: Write package name=version to /root/packages.txt use >> for idempotency or it will overwrite
+      shell: "echo '{{ item }}={{ ansible_facts.packages[item][0].version }}' >> /root/packages.txt"
+      when: item in ansible_facts.packages
+      loop: "{{ package_list }}"
+
+    - name: Show file contents
+      shell: cat /root/packages.txt
+      register: file_output
+
+    - debug:
+        var: file_output.stdout_lines
+

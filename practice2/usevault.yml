@@ -1,0 +1,22 @@
+---
+- name: use secret vault
+  hosts: ansible4
+  vars_files:
+    - cloudpass.yml
+  tasks:
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: /root/cloudcreds.txt
+        state: touch
+
+    - name: using cloud vault
+      ansible.builtin.blockinfile:
+        path: /root/cloudcreds.txt
+        block: |
+          CLOUDID={{ CLOUDID }}
+          CLOUDPASS={{ CLOUDPASS }}
+      register: vault_file
+
+    - name: debug
+      debug:
+        var: vault_file

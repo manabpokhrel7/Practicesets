@@ -1,0 +1,11 @@
+---
+- name: report on package facts
+  hosts: ansible4
+  vars:
+    - package: /root/packages.txt
+  tasks:
+    - name: use command module to generate packages
+      command: echo "rpm -qa | grep kernel" > {{ package }}
+
+    - name: 
+      

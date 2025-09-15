@@ -1,0 +1,9 @@
+---
+- name: setup repo in client
+  hosts: ansible4
+  tasks:
+    - name: Add repository
+      ansible.builtin.yum_repository:
+        name: custom_repo
+        description: myrepo
+        baseurl: ftp://172.16.138.174/repos

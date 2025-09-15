@@ -1,0 +1,9 @@
+[test]
+ansible1
+
+[dev]
+ansible2
+
+[prod]
+ansible3
+ansible4

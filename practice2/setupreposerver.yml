@@ -1,0 +1,30 @@
+---
+- name: setup control host as repo
+  hosts: localhost
+  tasks:
+    - name: make the dir /var/ftp/repo
+      file:
+       path: /var/ftp/repo
+       state: directory
+
+    - name: create the repo
+      command: createrepo_c /var/ftp/repo/
+
+    - name: disable firewalld
+      ansible.builtin.service:
+        name: firewalld
+        enabled: no
+
+    - name: enable vsftpd
+      ansible.builtin.service:
+        name: vsftpd
+        enabled: yes
+        state: started
+
+    - name: Ensure SELinux is set to enforcing mode
+      ansible.builtin.lineinfile:
+        path: /etc/vsftpd/vsftpd.conf
+        regexp: '^anonymous_enable'
+        line: anonymous_enable=YES
+
+

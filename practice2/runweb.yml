@@ -1,0 +1,5 @@
+---
+- name: question number 6
+  hosts: ansible4
+  roles:
+    - apache_web

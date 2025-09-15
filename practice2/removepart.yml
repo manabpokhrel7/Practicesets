@@ -1,0 +1,9 @@
+---
+- name: remove the partitions
+  hosts: all
+  tasks:
+    - name: Remove all partitions from disk
+      community.general.parted:
+        device: /dev/nvme0n3
+        number: 1
+        state: absent

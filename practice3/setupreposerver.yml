@@ -1,0 +1,41 @@
+---
+- name: qns 2
+  hosts: localhost
+  tasks:
+    - name: mkdir the /var/ftp/repo folder
+      ansible.builtin.file:
+        path: /var/ftp/repo
+        state: directory
+    - name: install vsftpd
+      dnf: 
+        name: vsftpd
+        state: latest
+    - name: createrepo
+      dnf: 
+        name: createrepo
+        state: latest
+
+    - name: use createrepo to creat repo
+      command: createrepo_c /var/ftp/repo
+    - name: use dnf to clean all
+      command: dnf clean all 
+    - name: disable firewalld
+      ansible.builtin.service:
+        name: firewalld
+        state: stopped
+    - name: Gather the package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: debug the repo id
+      debug:
+        var: ansible_default_ipv4.address
+    - name: Validate the sudoers file before saving
+      ansible.builtin.lineinfile:
+        path: /etc/vsftpd/vsftpd.conf
+        regexp: '^anonymous_enable='
+        line: 'anonymous_enable=YES'
+    - name: restart the vsftpd service
+      ansible.builtin.service:
+        name: vsftpd
+        state: restarted

@@ -1,0 +1,42 @@
+---
+# tasks file for roles/apache_web
+- name: echo ansible hostname
+  command: echo {{ ansible_hostname }}
+  register: host_name
+- name: start firewalld, in all cases
+  ansible.builtin.service:
+        name: firewalld
+        state: started
+- name: install httpd
+  dnf:
+        name: httpd
+        state: latest
+- name: Permanently enable https service, also enable it immediately if possible
+  ansible.posix.firewalld:
+        service: http
+        state: enabled
+        permanent: true
+        immediate: true
+- name: debug
+  debug:
+        var: host_name
+
+- name: debug
+  debug:
+        msg: "{{ ansible_default_ipv4.address }}" 
+
+- name: template 
+  ansible.builtin.template:
+        src: template.j2
+        dest: /var/www/html/index.html
+
+- name: Restart service httpd, in all cases
+  ansible.builtin.service:
+        name: httpd
+        state: restarted
+- name: use curl
+  command: curl localhost
+  register: cu_rl
+- name: debug
+  debug:
+        var: cu_rl

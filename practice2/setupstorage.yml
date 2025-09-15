@@ -1,0 +1,36 @@
+---
+- name: task2
+  hosts: all
+  tasks:
+    - name: Create a new ext4 primary partition
+      community.general.parted:
+        device: /dev/nvme0n2
+        number: 1
+        state: present
+        fs_type: ext3
+        part_end: 5GiB
+
+    - name: create a vg
+      community.general.lvg:
+        vg: vgdata
+        pvs: /dev/nvme0n2p1
+        pesize: 8M
+
+    - name: Create a logical volume of 512m
+      community.general.lvol:
+        vg: vgdata
+        lv: lvdata
+        size: 1G
+
+    - name: Create a ext3 filesystem 
+      community.general.filesystem:
+        fstype: ext3
+        dev: /dev/vgdata/lvdata
+
+    - name: mount the filesyste
+      ansible.posix.mount:
+        path: /data
+        src: /dev/vgdata/lvdata
+        state: mounted
+        fstype: ext3
+

@@ -1,0 +1,6 @@
+---
+- name: use the role in question 5
+  hosts: ansible4
+  roles:
+    - geerlingguy.docker
+    - geerlingguy.nginx 
