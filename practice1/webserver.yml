@@ -1,0 +1,23 @@
+    - name: install httpd first
+      dnf:
+        name: "{{ web_server }}"
+        state: present
+
+
+    - name: Template a file
+      ansible.builtin.template:
+        src: httpd.j2
+        dest: "{{ web_config_file }}"
+      notify:
+        - my_handler
+      
+    - name: Permanently enable https service, also enable it immediately if possible
+      ansible.posix.firewalld:
+        service: http
+        state: enabled
+        permanent: true
+        immediate: true
+
+
+
+

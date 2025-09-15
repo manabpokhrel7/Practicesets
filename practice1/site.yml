@@ -1,0 +1,21 @@
+---
+- name: Using include
+  hosts: webclients
+  vars_files:
+    - variables
+  tasks:
+    - name: Include web client tasks dynamically
+      ansible.builtin.include_tasks: webclient.yml
+
+- name: using asnible on webservers
+  hosts: webservers
+  vars_files:
+    - variables
+  tasks:
+    - name: Include web server tasks dynamically
+      ansible.builtin.include_tasks: webserver.yml
+  handlers:
+    - name: my_handler
+      ansible.builtin.service:
+        name: "{{ web_server }}"
+        state: restarted

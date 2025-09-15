@@ -1,0 +1,43 @@
+---
+# tasks file for roles/num4
+- name: Create a new ext4 primary partition
+  community.general.parted:
+    device: /dev/nvme0n3
+    number: 1
+    fs_type: xfs
+    state: present
+    label: gpt 
+    part_start: 1MiB
+    part_end: 100%
+- name: Create a xfs filesystem
+  community.general.filesystem:
+    fstype: xfs
+    dev: /dev/nvme0n3p1
+- name: mkdir /web dir
+  ansible.builtin.file:
+    path: "{{ Web_dir }}"
+    state: directory 
+- name: Mount and bind a volume
+  ansible.posix.mount:
+    src: /dev/nvme0n3p1
+    path: "{{ Web_dir }}"
+    state: mounted
+    fstype: xfs
+- name: set selinux context
+  community.general.sefcontext:
+    target: "{{ Web_dir }}"
+    setype: "{{ Selinux_type }}"
+    state: present
+- name: use restorecon
+  command: restorecon -R -v /web
+- name: create the index.html file
+  ansible.builtin.file:
+    path: "{{ Web_file }}"
+    state: touch
+- name: Template a file to /etc/file.conf
+  ansible.builtin.template:
+    src: index.j2
+    dest: "{{ Web_file }}"
+
+
+

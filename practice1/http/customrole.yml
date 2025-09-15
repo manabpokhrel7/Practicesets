@@ -1,0 +1,11 @@
+---
+- name: calling the role in webclient
+  hosts: webclients
+  roles:
+    - webclient
+
+- name: in web server
+  hosts: webservers
+  roles:
+    - webserver
+

@@ -1,0 +1,5 @@
+---
+# vars file for roles/num4
+Web_dir: /web
+Selinux_type: httpd_sys_content_t
+Web_file: /web/index.html

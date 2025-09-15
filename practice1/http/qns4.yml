@@ -1,0 +1,5 @@
+---
+- name: activate the question 4 role from set 1
+  hosts: all
+  roles:
+    - num4 
