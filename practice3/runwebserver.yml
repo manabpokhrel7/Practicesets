@@ -1,0 +1,49 @@
+---
+- name: qns 6
+  hosts: ansible4
+  vars_files:
+    - variable
+  tasks:
+    - name: Change file ownership, group and permissions
+      ansible.builtin.file:
+        path: /webcontent
+        state: directory
+
+    - name: Change file ownership, group and permissions
+      ansible.builtin.file:
+        path: /webcontent/index.html
+        state: touch
+        mode: '1777'
+    - name: Allow apache to modify files in /srv/git_repos
+      community.general.sefcontext:
+        target: '/webcontent/index.html?'
+        setype: httpd_sys_rw_content_t
+        state: present
+    - name: restorecon
+      command: restorecon -R -v /webcontent/index.html 
+
+    - name: using lineinfile
+      ansible.builtin.lineinfile:
+        path: /webcontent/index.html
+        regexp: '^welcome to this webserver. The server is managed by '
+        line: welcome to this webserver. The server is managed by {{ USERNAME }}.
+    - name: install httpd
+      dnf: 
+        name: httpd
+        state: latest
+
+    - name: command to generate the link
+      command: ln -sf /webcontent/index.html /var/www/html/index.html
+
+    - name: Restart service httpd, in all cases
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+
+    - name: test the localhost
+      command: curl localhost
+      register: res_ult
+
+    - name: echo the result
+      debug:
+        var: res_ult

@@ -1,0 +1,50 @@
+---
+- name: qns3
+  hosts: ansible4
+  tasks:
+    - name: copy the files
+      copy:
+        src: hwtemplate.txt 
+        dest: /root/report.txt
+
+    - name: lineinfile
+      ansible.builtin.lineinfile:
+        path: /root/report.txt
+        regexp: '^NAME='
+        line: 'NAME={{ ansible_fqdn }}'
+
+    - name: lineinfile
+      ansible.builtin.lineinfile:
+        path: /root/report.txt
+        regexp: '^IPADDRESS='
+        line: 'IPADDRESS={{ ansible_default_ipv4.address }}'
+    - name: lineinfile
+      ansible.builtin.lineinfile:
+        path: /root/report.txt
+        regexp: '^TOTAL_MEMORY='
+        line: 'TOTAL_MEMORY={{ ansible_memory_mb.real.total }}'
+    - name: lineinfile
+      ansible.builtin.lineinfile:
+        path: /root/report.txt
+        regexp: '^NIC_NAME='
+        line: 'NIC_NAME={{ ansible_ens160.device }}'
+
+    - name: check for device sr1
+      ansible.builtin.lineinfile:
+        path: /root/report.txt
+        regexp: '^SECOND_NIC_NAME='
+        line: 'SECOND_NIC_NAME={{ ansible_ens161.device }}'
+      when: ansible_ens161.device.model is defined
+    - name: check for device sr1
+      ansible.builtin.lineinfile:
+        path: /root/report.txt
+        regexp: '^SECOND_NIC_NAME='
+        line: 'SECOND_NIC_NAME=NONE'
+      when: ansible_ens161.device is not defined
+    - name: see the result
+      command: cat /root/report.txt
+      register: res_ult
+
+    - name: debug
+      debug:
+        var: res_ult

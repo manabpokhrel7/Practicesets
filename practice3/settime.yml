@@ -1,0 +1,20 @@
+---
+- name: set time using roles
+  hosts: ansible4
+  vars:
+    timesync_ntp_servers:
+      - hostname: control.example.com
+        iburst: true
+  roles:
+    - rhel-system-roles.timesync
+  tasks:
+    - name: Show final success message
+      command: systemctl start chronyd
+      register: stat_us
+
+    - name: print the msg 
+      ansible.builtin.assert:
+        that:
+          - stat_us.rc == 0
+        fail_msg: "timesync is not enabled"
+        success_msg: "it is enabled"

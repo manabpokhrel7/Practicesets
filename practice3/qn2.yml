@@ -1,0 +1,32 @@
+---
+- name: configure lv
+  hosts: ansible4
+  tasks:
+    - name: command
+      command: sudo vgs rhel -o vg_size --noheadings
+      register: vg_size
+    - name: command
+      command: sudo vgs rhel -o vg_name --noheadings
+      register: vg_name
+    - name: debug
+      debug: 
+        var: vg_size
+    - name: Create a new ext4 primary partition
+      community.general.parted:
+        device: /dev/nvme0n2
+        number: 1
+        state: present
+        part_end: 2GiB
+        fs_type: ext4 
+
+    - name: Create a volume group 
+      community.general.lvg:
+        vg: vgdata
+        pvs: /dev/nvme0n2p1
+  
+    - name: Create a logical volume the size of all remaining space in the volume group
+      community.general.lvol:
+        vg: vgdata
+        lv: lvdata
+        size: 100%FREE
+        force: true
